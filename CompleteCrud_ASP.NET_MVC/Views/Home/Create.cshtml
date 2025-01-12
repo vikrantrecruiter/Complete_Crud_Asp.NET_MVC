@@ -1,0 +1,138 @@
+﻿@model CompleteCrud_ASP.NET_MVC.Models.CandidateDbModel
+
+<html>
+<head>
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+</head>
+<body>
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.CandidateName, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.CandidateName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CandidateName, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Mobile, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Mobile, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Gender, htmlAttributes: new { @class = "control-label" })
+            <label>Male</label>
+            @Html.RadioButtonFor(model => model.Gender, "Male", new { htmlAttributes = new { @class = "form-control" } })
+            <label>Female</label>
+            @Html.RadioButtonFor(model => model.Gender, "Female", new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Skills, htmlAttributes: new { @class = "control-label" })
+
+            <div class="checkbox">
+                @Html.CheckBoxFor(model => model.Python, new { htmlAttributes = new { @classs = "Control-form" } })
+                <label>Python</label>
+                @Html.ValidationMessageFor(model => model.Python, "", new { @class = "text-danger" })
+                @Html.CheckBoxFor(model => model.Python, new { htmlAttributes = new { @class = "form-control" } })
+                <label>Java</label>
+                @Html.ValidationMessageFor(model => model.Java, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Country, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownList("CountryId", (SelectList)ViewBag.Country, "Select Country", new { @class = "form-select", id = "country" })
+            @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.State, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownList("StateId", new SelectList(Enumerable.Empty<SelectListItem>()), "Select State", new { @class = "form-select", id = "state" })
+            @Html.ValidationMessageFor(model => model.State, "", new { @class = "text-danger" })
+        </div>
+
+
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.City, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownList("City", new SelectList(Enumerable.Empty<SelectListItem>()), "Select City", new { @class = "form-select", id = "city" })
+            @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Photo, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Photo, new { htmlAttributes = new { @class = "control-form", id = "Photo", type = "file" } })
+            @Html.ValidationMessageFor(model => model.Photo, "", new { @class = "text-danger" })
+
+        </div>
+
+    </div>
+    <br />
+    <button type="submit" class="btn-primary" value="Submit">Submit</button>
+
+  <script>
+      $(document).ready(function () {
+          $('#country').change(function () {
+              var countryId = $(this).val();
+              $('#state').empty();
+              $('#state').append('<option>--Select State--</option>');
+              $('#city').empty();
+              $('#city').append('<option>--Select City--</option>');
+
+              if (countryId) {
+                  $.ajax({
+                      url: '@Url.Action("GetState","Home")',
+                      type: 'POST',
+                      data: { CountryId: countryId },
+                      success: function (states) {
+                          $.each(states, function (i, state) {
+                              $('#state').append('<option value="' + state.StateId + '">' + state.StateName + '</option>');
+                          });
+                      },
+                      error: function () {
+                          alert('Error is running');
+                      }
+                  });
+              }
+          });
+          $('#state').change(function () {
+              var stateid = $(this).val();
+              $('#city').empty();
+              $('#city').append('<option> --Select City-- </option>');
+             
+              if (stateid) {
+                  $.ajax({
+                      url: '@Url.Action("GetCity","Home")',
+                      type: 'POST',
+                      data: { stateId: stateid },
+                      success: function (cities) {
+                          $.each(cities, function (i, city) {
+                              $('#city').append('<option value="' + city.CityId + '">' + city.CityName + '</option>');
+
+
+                          });
+                      },
+                      error: function () {
+                         
+                          console.log("--Select City--");
+                      }
+                  });
+              }
+              
+                 
+          });
+      });
+    </script>
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</body>
+
+</html>
